@@ -1,28 +1,27 @@
-# flask_random_temp.py
-from flask import Flask, jsonify
-import threading
-import random
+import streamlit as st
+import requests
 import time
 
-app = Flask(__name__)
+st.title("Temperature Monitor")
 
-# Store latest temperature
-latest_data = {"id": 1, "temperature": None}
+API_URL = "http://127.0.0.1:5000/data"  # URL of your API sender/receiver
 
-# Background function to update temperature randomly
-def update_temperature():
-    while True:
-        latest_data["temperature"] = round(random.uniform(20.0, 40.0), 2)
-        time.sleep(2)  # update every 2 seconds
+# Streamlit auto-refresh every few seconds
+refresh_interval = 2  # seconds
 
-# API endpoint to provide the latest temperature
-@app.route("/data", methods=["GET"])
-def get_data():
-    return jsonify(latest_data)
+placeholder_id = st.empty()
+placeholder_temp = st.empty()
 
-if __name__ == "__main__":
-    # Start the background thread to update temperature
-    threading.Thread(target=update_temperature, daemon=True).start()
+while True:
+    try:
+        response = requests.get(API_URL)
+        if response.status_code == 200:
+            data = response.json()
+            placeholder_id.subheader(f"ID: {data.get('id')}")
+            placeholder_temp.text(f"Temperature: {data.get('temperature')} °C")
+        else:
+            placeholder_id.text("Error fetching data")
+    except Exception as e:
+        placeholder_id.text(f"Error: {e}")
     
-    # Run the Flask server
-    app.run(host="0.0.0.0", port=5000)
+    time.sleep(refresh_interval)
