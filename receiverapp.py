@@ -4,7 +4,7 @@ import time
 
 st.title("Temperature Monitor")
 
-API_URL = "http://127.0.0.1:5000/data"  # URL of your API sender/receiver
+API_URL = "https://simpleback-x5wr.onrender.com/data"  # URL of your API sender/receiver
 
 # Streamlit auto-refresh every few seconds
 refresh_interval = 2  # seconds
@@ -25,3 +25,4 @@ while True:
         placeholder_id.text(f"Error: {e}")
     
     time.sleep(refresh_interval)
+
